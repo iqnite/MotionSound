@@ -11,9 +11,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,8 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.motionsound.ui.theme.MotionSoundTheme
 import kotlin.math.sqrt
 
@@ -65,6 +75,10 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
         soundPool.load(afd, 1)
     }
 
+    val pagerState = rememberPagerState(pageCount = {
+        1
+    })
+
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -90,11 +104,12 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                         val speed =
                             sqrt((x - lastX) * (x - lastX) + (y - lastY) * (y - lastY) + (z - lastZ) * (z - lastZ)) / diffTime * 10000
 
-                        if (speed > MOVEMENT_THRESHOLD) {
-                            soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
-                            movementDetected = true
-                        } else {
-                            movementDetected = false
+                        movementDetected = false
+                        when (pagerState.currentPage) {
+                            0 -> if (speed > MOVEMENT_THRESHOLD) {
+                                soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
+                                movementDetected = true
+                            }
                         }
 
                         lastX = x
@@ -115,7 +130,48 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = if (movementDetected) "Moving!" else "Move the phone to play sound")
+    Column(modifier = modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { page ->
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = when (page) {
+                        0 -> "General movement"
+                        else -> "Page $page"
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color =
+                    if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(8.dp)
+                        .background(color, CircleShape)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = if (movementDetected) "Moving!" else "Move the phone to play sound")
+        }
     }
 }

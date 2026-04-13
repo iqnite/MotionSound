@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.motionsound.ui.theme.MotionSoundTheme
 import kotlin.math.sqrt
@@ -53,6 +54,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Preview
 @Composable
 fun MotionSoundScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -103,9 +105,11 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
             private var lastY = 0f
             private var lastZ = 0f
             private var isMoving = false
+            private var movementStartTime: Long = 0
             private val MOVEMENT_THRESHOLD = 800f
             private val EXPLOSION_MOVE_SPEED_THRESHOLD = 900f
             private val EXPLOSION_STOP_SPEED_THRESHOLD = 10f
+            private val EXPLOSION_MIN_THROW_DURATION = 500
 
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
@@ -129,15 +133,22 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
 
                         var detected = false
                         if (pagerState.currentPage == 0 && speed > MOVEMENT_THRESHOLD) {
-                            playSound("jump")
                             detected = true
+                            playSound("jump")
                         } else if (pagerState.currentPage == 1) {
-                            if (isMoving && speed < EXPLOSION_STOP_SPEED_THRESHOLD) {
-                                playSound("explosion")
-                                detected = true
-                                isMoving = false
-                            } else if (!isMoving && speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                            if (isMoving) {
+                                if (speed < EXPLOSION_STOP_SPEED_THRESHOLD && currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
+                                    detected = true
+                                    isMoving = false
+                                    playSound("explosion")
+                                }
+                                if (speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                                    isMoving = false
+                                    movementStartTime = currentTime
+                                }
+                            } else if (speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
                                 isMoving = true
+                                movementStartTime = currentTime
                             }
                         }
                         movementDetected = detected

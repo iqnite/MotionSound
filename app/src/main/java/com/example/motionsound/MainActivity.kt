@@ -69,15 +69,27 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
             .build()
     }
 
-    val soundId = remember {
-        val assetManager = context.assets
-        val afd = assetManager.openFd("jump.wav")
-        soundPool.load(afd, 1)
+    @Composable
+    fun getSound(fileName: String): Int {
+        return remember(fileName) {
+            val assetManager = context.assets
+            val afd = assetManager.openFd(fileName)
+            soundPool.load(afd, 1)
+        }
     }
+
+    val jumpSoundId = getSound("jump.wav")
+    val soundIds = remember(jumpSoundId) { mapOf("jump" to jumpSoundId) }
 
     val pagerState = rememberPagerState(pageCount = {
         1
     })
+
+    fun playSound(soundId: String) {
+        soundIds[soundId]?.let { id ->
+            soundPool.play(id, 1f, 1f, 0, 0, 1f)
+        }
+    }
 
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -107,13 +119,12 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                         val speed =
                             sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
 
-                        movementDetected = false
-                        when (pagerState.currentPage) {
-                            0 -> if (speed > MOVEMENT_THRESHOLD) {
-                                soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
-                                movementDetected = true
-                            }
+                        var detected = false
+                        if (pagerState.currentPage == 0 && speed > MOVEMENT_THRESHOLD) {
+                            playSound("jump")
+                            detected = true
                         }
+                        movementDetected = detected
 
                         lastX = x
                         lastY = y

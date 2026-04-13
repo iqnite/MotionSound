@@ -101,8 +101,11 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                         val diffTime = (currentTime - lastUpdate)
                         lastUpdate = currentTime
 
+                        val deltaX = x - lastX
+                        val deltaY = y - lastY
+                        val deltaZ = z - lastZ
                         val speed =
-                            sqrt((x - lastX) * (x - lastX) + (y - lastY) * (y - lastY) + (z - lastZ) * (z - lastZ)) / diffTime * 10000
+                            sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
 
                         movementDetected = false
                         when (pagerState.currentPage) {

@@ -79,10 +79,12 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
     }
 
     val jumpSoundId = getSound("jump.wav")
-    val soundIds = remember(jumpSoundId) { mapOf("jump" to jumpSoundId) }
+    val explosionSoundId = getSound("explosion.mp3")
+    val soundIds =
+        remember(jumpSoundId) { mapOf("jump" to jumpSoundId, "explosion" to explosionSoundId) }
 
     val pagerState = rememberPagerState(pageCount = {
-        1
+        2
     })
 
     fun playSound(soundId: String) {
@@ -100,7 +102,10 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
             private var lastX = 0f
             private var lastY = 0f
             private var lastZ = 0f
+            private var isMoving = false
             private val MOVEMENT_THRESHOLD = 800f
+            private val EXPLOSION_MOVE_SPEED_THRESHOLD = 900f
+            private val EXPLOSION_STOP_SPEED_THRESHOLD = 10f
 
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
@@ -118,11 +123,22 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                         val deltaZ = z - lastZ
                         val speed =
                             sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
+                        val speedX = sqrt(deltaX * deltaX) / diffTime * 10000
+                        val speedY = sqrt(deltaY * deltaY) / diffTime * 10000
+                        val speedZ = sqrt(deltaZ * deltaZ) / diffTime * 10000
 
                         var detected = false
                         if (pagerState.currentPage == 0 && speed > MOVEMENT_THRESHOLD) {
                             playSound("jump")
                             detected = true
+                        } else if (pagerState.currentPage == 1) {
+                            if (isMoving && speed < EXPLOSION_STOP_SPEED_THRESHOLD) {
+                                playSound("explosion")
+                                detected = true
+                                isMoving = false
+                            } else if (!isMoving && speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                                isMoving = true
+                            }
                         }
                         movementDetected = detected
 
@@ -153,6 +169,7 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                 Text(
                     text = when (page) {
                         0 -> "General movement"
+                        1 -> "Bomb"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),

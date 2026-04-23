@@ -1,12 +1,5 @@
 package com.example.motionsound
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.media.AudioAttributes
-import android.media.SoundPool
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,18 +20,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.motionsound.ui.theme.MotionSoundTheme
-import kotlin.math.sqrt
+import com.example.motionsound.ui.viewmodel.MotionSoundViewModel
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,120 +45,30 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
 @Composable
-fun MotionSoundScreen(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    var movementDetected by remember { mutableStateOf(false) }
+fun MotionSoundScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MotionSoundViewModel = viewModel()
+) {
+    val pagerState = rememberPagerState(pageCount = { 2 })
 
-    val soundPool = remember {
-        val attributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
-        SoundPool.Builder()
-            .setMaxStreams(5)
-            .setAudioAttributes(attributes)
-            .build()
-    }
-
-    @Composable
-    fun getSound(fileName: String): Int {
-        return remember(fileName) {
-            val assetManager = context.assets
-            val afd = assetManager.openFd(fileName)
-            soundPool.load(afd, 1)
-        }
-    }
-
-    val jumpSoundId = getSound("jump.wav")
-    val explosionSoundId = getSound("explosion.mp3")
-    val soundIds =
-        remember(jumpSoundId) { mapOf("jump" to jumpSoundId, "explosion" to explosionSoundId) }
-
-    val pagerState = rememberPagerState(pageCount = {
-        2
-    })
-
-    fun playSound(soundId: String) {
-        soundIds[soundId]?.let { id ->
-            soundPool.play(id, 1f, 1f, 0, 0, 1f)
-        }
+    // Sync pager state with ViewModel
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.onPageChanged(pagerState.currentPage)
     }
 
     DisposableEffect(Unit) {
-        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-
-        val listener = object : SensorEventListener {
-            private var lastUpdate: Long = 0
-            private var lastX = 0f
-            private var lastY = 0f
-            private var lastZ = 0f
-            private var isMoving = false
-            private var movementStartTime: Long = 0
-            private val MOVEMENT_THRESHOLD = 800f
-            private val EXPLOSION_MOVE_SPEED_THRESHOLD = 900f
-            private val EXPLOSION_STOP_SPEED_THRESHOLD = 10f
-            private val EXPLOSION_MIN_THROW_DURATION = 500
-
-            override fun onSensorChanged(event: SensorEvent) {
-                if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                    val x = event.values[0]
-                    val y = event.values[1]
-                    val z = event.values[2]
-
-                    val currentTime = System.currentTimeMillis()
-                    if ((currentTime - lastUpdate) > 100) {
-                        val diffTime = (currentTime - lastUpdate)
-                        lastUpdate = currentTime
-
-                        val deltaX = x - lastX
-                        val deltaY = y - lastY
-                        val deltaZ = z - lastZ
-                        val speed =
-                            sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
-                        val speedX = sqrt(deltaX * deltaX) / diffTime * 10000
-                        val speedY = sqrt(deltaY * deltaY) / diffTime * 10000
-                        val speedZ = sqrt(deltaZ * deltaZ) / diffTime * 10000
-
-                        var detected = false
-                        if (pagerState.currentPage == 0 && speed > MOVEMENT_THRESHOLD) {
-                            detected = true
-                            playSound("jump")
-                        } else if (pagerState.currentPage == 1) {
-                            if (isMoving) {
-                                if (speed < EXPLOSION_STOP_SPEED_THRESHOLD && currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
-                                    detected = true
-                                    isMoving = false
-                                    playSound("explosion")
-                                }
-                                if (speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
-                                    isMoving = false
-                                    movementStartTime = currentTime
-                                }
-                            } else if (speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
-                                isMoving = true
-                                movementStartTime = currentTime
-                            }
-                        }
-                        movementDetected = detected
-
-                        lastX = x
-                        lastY = y
-                        lastZ = z
-                    }
-                }
-            }
-
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-        }
-
-        sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)
-
+        viewModel.startListening()
         onDispose {
-            sensorManager.unregisterListener(listener)
-            soundPool.release()
+            viewModel.stopListening()
+        }
+    }
+
+    // Reset movement detection text after a short delay
+    LaunchedEffect(viewModel.movementDetected) {
+        if (viewModel.movementDetected) {
+            delay(1000)
+            viewModel.resetMovementDetection()
         }
     }
 
@@ -184,7 +85,7 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -213,7 +114,7 @@ fun MotionSoundScreen(modifier: Modifier = Modifier) {
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = if (movementDetected) "Moving!" else "Move the phone to play sound")
+            Text(text = if (viewModel.movementDetected) "Moving!" else "Move the phone to play sound")
         }
     }
 }

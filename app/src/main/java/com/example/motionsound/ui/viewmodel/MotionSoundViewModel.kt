@@ -21,13 +21,18 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
     var currentPage by mutableStateOf(0)
         private set
 
+    var soundVariation by mutableStateOf("")
+        set
+
     init {
         soundPlayer.loadSound("jump", "jump.wav")
         soundPlayer.loadSound("explosion", "explosion.mp3")
+        soundPlayer.loadSound("explosionfahh", "fahh.mp3")
         soundPlayer.loadSound("speed", "speed.wav")
     }
 
     fun onPageChanged(page: Int) {
+        soundVariation = ""
         currentPage = page
         finishMotion()
     }
@@ -42,7 +47,7 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
             onExplosionDetected = {
                 finishMotion()
                 movementDetected = true
-                soundPlayer.playSound("explosion")
+                soundPlayer.playSound("explosion" + soundVariation)
             },
             onSpeedDetected = { speed ->
                 if (isLooping) {

@@ -16,11 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +58,8 @@ fun MotionSoundScreen(
     viewModel: MotionSoundViewModel = viewModel()
 ) {
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 4 })
+    var variationMenuExpanded by remember { mutableStateOf(false) }
+    var selectedVariation by remember { mutableStateOf("Bomb") }
 
     // Sync pager state with ViewModel
     LaunchedEffect(pagerState.currentPage) {
@@ -72,6 +81,30 @@ fun MotionSoundScreen(
         }
     }
 
+    @Composable
+    fun variationMenu(variations: Map<String, String>) {
+        Box(modifier = Modifier.padding(top = 100.dp)) {
+            Button(onClick = { variationMenuExpanded = true }) {
+                Text(selectedVariation)
+            }
+            DropdownMenu(
+                expanded = variationMenuExpanded,
+                onDismissRequest = { variationMenuExpanded = false }
+            ) {
+                for ((id, text) in variations) {
+                    DropdownMenuItem(
+                        text = { Text(text) },
+                        onClick = {
+                            selectedVariation = text
+                            viewModel.soundVariation = id
+                            variationMenuExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
@@ -82,13 +115,16 @@ fun MotionSoundScreen(
                     text = when (page) {
                         0 -> "Silent"
                         1 -> "General movement"
-                        2 -> "Bomb"
+                        2 -> "Throw"
                         3 -> "Speed"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
+                if (page == 2) {
+                    variationMenu(mapOf(("" to "Bomb"), ("fahh" to "Fahh")))
+                }
             }
         }
 

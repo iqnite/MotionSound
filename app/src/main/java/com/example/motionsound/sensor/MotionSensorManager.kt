@@ -53,7 +53,8 @@ class MotionSensorManager(context: Context) {
                             sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
 
                         // Apply EMA smoothing
-                        smoothedSpeed = (smoothedSpeed * (1 - SMOOTHING_FACTOR)) + (rawSpeed * SMOOTHING_FACTOR)
+                        smoothedSpeed =
+                            (smoothedSpeed * (1 - SMOOTHING_FACTOR)) + (rawSpeed * SMOOTHING_FACTOR)
 
                         val currentPage = getCurrentPage()
                         // Reset state when switching pages
@@ -66,9 +67,9 @@ class MotionSensorManager(context: Context) {
                             smoothedSpeed = 0f
                         }
 
-                        if (currentPage == 0 && smoothedSpeed > MOVEMENT_THRESHOLD) {
+                        if (currentPage == 1 && smoothedSpeed > MOVEMENT_THRESHOLD) {
                             onJumpDetected()
-                        } else if (currentPage == 1) {
+                        } else if (currentPage == 2) {
                             if (isMoving) {
                                 if (smoothedSpeed < STOP_SPEED_THRESHOLD && currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
                                     onExplosionDetected()
@@ -82,7 +83,7 @@ class MotionSensorManager(context: Context) {
                                 isMoving = true
                                 movementStartTime = currentTime
                             }
-                        } else if (currentPage == 2) {
+                        } else if (currentPage == 3) {
                             if (smoothedSpeed > MOVEMENT_THRESHOLD) {
                                 isMoving = true
                                 onSpeedDetected(smoothedSpeed)

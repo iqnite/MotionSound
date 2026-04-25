@@ -24,7 +24,7 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
     init {
         soundPlayer.loadSound("jump", "jump.wav")
         soundPlayer.loadSound("explosion", "explosion.mp3")
-        soundPlayer.loadSound("speed", "speed.mp3")
+        soundPlayer.loadSound("speed", "speed.wav")
     }
 
     fun onPageChanged(page: Int) {

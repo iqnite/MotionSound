@@ -32,8 +32,8 @@ class MotionSensorManager(context: Context) {
             private val SMOOTHING_FACTOR = 0.2f
             private val MOVEMENT_THRESHOLD = 200f
             private val EXPLOSION_MOVE_SPEED_THRESHOLD = 800f
-            private val STOP_SPEED_THRESHOLD = 40f
-            private val EXPLOSION_MIN_THROW_DURATION = 500
+            private val STOP_SPEED_THRESHOLD = 60f
+            private val EXPLOSION_MIN_THROW_DURATION = 200
 
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
@@ -42,7 +42,7 @@ class MotionSensorManager(context: Context) {
                     val z = event.values[2]
 
                     val currentTime = System.currentTimeMillis()
-                    if ((currentTime - lastUpdate) > 100) {
+                    if ((currentTime - lastUpdate) > 30) {
                         val diffTime = (currentTime - lastUpdate)
                         lastUpdate = currentTime
 
@@ -57,7 +57,6 @@ class MotionSensorManager(context: Context) {
                             (smoothedSpeed * (1 - SMOOTHING_FACTOR)) + (rawSpeed * SMOOTHING_FACTOR)
 
                         val currentPage = getCurrentPage()
-                        // Reset state when switching pages
                         if (currentPage != lastPage) {
                             if (isMoving) {
                                 onMotionStop()
@@ -88,7 +87,6 @@ class MotionSensorManager(context: Context) {
                                 isMoving = true
                                 onSpeedDetected(smoothedSpeed)
                             } else if (isMoving && smoothedSpeed > STOP_SPEED_THRESHOLD) {
-                                // Keep updating speed even if it drops below starting threshold
                                 onSpeedDetected(smoothedSpeed)
                             } else if (smoothedSpeed < STOP_SPEED_THRESHOLD) {
                                 if (isMoving) {

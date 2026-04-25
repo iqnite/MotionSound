@@ -16,6 +16,7 @@ class SoundPlayer(private val context: Context) {
         .build()
 
     private val soundMap = mutableMapOf<String, Int>()
+    private val streamIds = mutableListOf<Int>()
 
     fun loadSound(name: String, fileName: String) {
         try {
@@ -27,9 +28,25 @@ class SoundPlayer(private val context: Context) {
         }
     }
 
-    fun playSound(name: String) {
+    fun playSound(name: String, loop: Int = 0, rate: Float = 1f) {
         soundMap[name]?.let { soundId ->
-            soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
+            val sid = soundPool.play(
+                soundId, 1f, 1f, 0, loop, rate
+            )
+            if (sid != 0 && loop != 0) streamIds.add(sid)
+        }
+    }
+
+    fun finishLoopSounds() {
+        for (sid in streamIds) {
+            soundPool.stop(sid)
+        }
+        streamIds.clear()
+    }
+
+    fun setLoopSoundRate(rate: Float) {
+        for (sid in streamIds) {
+            soundPool.setRate(sid, rate)
         }
     }
 

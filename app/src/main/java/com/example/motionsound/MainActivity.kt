@@ -50,7 +50,7 @@ fun MotionSoundScreen(
     modifier: Modifier = Modifier,
     viewModel: MotionSoundViewModel = viewModel()
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState = rememberPagerState(pageCount = { 3 })
 
     // Sync pager state with ViewModel
     LaunchedEffect(pagerState.currentPage) {
@@ -82,6 +82,7 @@ fun MotionSoundScreen(
                     text = when (page) {
                         0 -> "General movement"
                         1 -> "Bomb"
+                        2 -> "Speed"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),

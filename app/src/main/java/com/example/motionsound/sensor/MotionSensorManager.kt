@@ -16,6 +16,8 @@ class MotionSensorManager(context: Context) {
     fun startListening(
         onJumpDetected: () -> Unit,
         onExplosionDetected: () -> Unit,
+        onSpeedDetected: (Float) -> Unit,
+        onMotionStop: () -> Unit,
         getCurrentPage: () -> Int
     ) {
         listener = object : SensorEventListener {
@@ -25,9 +27,12 @@ class MotionSensorManager(context: Context) {
             private var lastZ = 0f
             private var isMoving = false
             private var movementStartTime: Long = 0
-            private val MOVEMENT_THRESHOLD = 800f
-            private val EXPLOSION_MOVE_SPEED_THRESHOLD = 900f
-            private val EXPLOSION_STOP_SPEED_THRESHOLD = 10f
+            private var lastPage = -1
+            private var smoothedSpeed = 0f
+            private val SMOOTHING_FACTOR = 0.2f
+            private val MOVEMENT_THRESHOLD = 200f
+            private val EXPLOSION_MOVE_SPEED_THRESHOLD = 800f
+            private val STOP_SPEED_THRESHOLD = 40f
             private val EXPLOSION_MIN_THROW_DURATION = 500
 
             override fun onSensorChanged(event: SensorEvent) {
@@ -44,24 +49,51 @@ class MotionSensorManager(context: Context) {
                         val deltaX = x - lastX
                         val deltaY = y - lastY
                         val deltaZ = z - lastZ
-                        val speed = sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
+                        val rawSpeed =
+                            sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / diffTime * 10000
+
+                        // Apply EMA smoothing
+                        smoothedSpeed = (smoothedSpeed * (1 - SMOOTHING_FACTOR)) + (rawSpeed * SMOOTHING_FACTOR)
 
                         val currentPage = getCurrentPage()
-                        if (currentPage == 0 && speed > MOVEMENT_THRESHOLD) {
+                        // Reset state when switching pages
+                        if (currentPage != lastPage) {
+                            if (isMoving) {
+                                onMotionStop()
+                            }
+                            isMoving = false
+                            lastPage = currentPage
+                            smoothedSpeed = 0f
+                        }
+
+                        if (currentPage == 0 && smoothedSpeed > MOVEMENT_THRESHOLD) {
                             onJumpDetected()
                         } else if (currentPage == 1) {
                             if (isMoving) {
-                                if (speed < EXPLOSION_STOP_SPEED_THRESHOLD && currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
+                                if (smoothedSpeed < STOP_SPEED_THRESHOLD && currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
                                     onExplosionDetected()
                                     isMoving = false
                                 }
-                                if (speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                                if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
                                     isMoving = false
                                     movementStartTime = currentTime
                                 }
-                            } else if (speed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                            } else if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
                                 isMoving = true
                                 movementStartTime = currentTime
+                            }
+                        } else if (currentPage == 2) {
+                            if (smoothedSpeed > MOVEMENT_THRESHOLD) {
+                                isMoving = true
+                                onSpeedDetected(smoothedSpeed)
+                            } else if (isMoving && smoothedSpeed > STOP_SPEED_THRESHOLD) {
+                                // Keep updating speed even if it drops below starting threshold
+                                onSpeedDetected(smoothedSpeed)
+                            } else if (smoothedSpeed < STOP_SPEED_THRESHOLD) {
+                                if (isMoving) {
+                                    onMotionStop()
+                                    isMoving = false
+                                }
                             }
                         }
 
@@ -74,7 +106,7 @@ class MotionSensorManager(context: Context) {
 
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
-        sensorManager.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        sensorManager.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_GAME)
     }
 
     fun stopListening() {

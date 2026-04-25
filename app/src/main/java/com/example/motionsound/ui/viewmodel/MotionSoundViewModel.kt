@@ -46,7 +46,9 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
             },
             onSpeedDetected = { speed ->
                 if (isLooping) {
-                    soundPlayer.setLoopSoundRate((speed / 1000f).coerceIn(0.5f, 2.0f))
+                    val normalizedSpeed = speed / 1000f
+                    soundPlayer.setLoopSoundRate(normalizedSpeed.coerceIn(0.5f, 2.0f))
+                    soundPlayer.setLoopSoundVolume((normalizedSpeed).coerceIn(0f, 1.0f))
                 } else {
                     finishMotion()
                     movementDetected = true

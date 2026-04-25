@@ -50,6 +50,12 @@ class SoundPlayer(private val context: Context) {
         }
     }
 
+    fun setLoopSoundVolume(volume: Float) {
+        for (sid in streamIds) {
+            soundPool.setVolume(sid, volume, volume)
+        }
+    }
+
     fun release() {
         soundPool.release()
     }

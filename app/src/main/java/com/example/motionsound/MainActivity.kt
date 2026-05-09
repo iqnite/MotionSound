@@ -123,7 +123,7 @@ fun MotionSoundScreen(
                     textAlign = TextAlign.Center
                 )
                 if (page == 2) {
-                    variationMenu(mapOf(("" to "Bomb"), ("fahh" to "Fahh")))
+                    variationMenu(mapOf(("" to "Bomb"), ("fahh" to "Fahh"), ("pipe" to "Pipe")))
                 }
             }
         }

@@ -28,6 +28,7 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
         soundPlayer.loadSound("jump", "jump.wav")
         soundPlayer.loadSound("explosion", "explosion.mp3")
         soundPlayer.loadSound("explosionfahh", "fahh.mp3")
+        soundPlayer.loadSound("explosionpipe", "metalpipe.mp3")
         soundPlayer.loadSound("speed", "speed.wav")
     }
 

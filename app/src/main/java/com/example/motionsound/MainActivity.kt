@@ -59,7 +59,6 @@ fun MotionSoundScreen(
 ) {
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 5 })
     var variationMenuExpanded by remember { mutableStateOf(false) }
-    var selectedVariation by remember { mutableStateOf("Bomb") }
 
     // Sync pager state with ViewModel
     LaunchedEffect(pagerState.currentPage) {
@@ -83,9 +82,10 @@ fun MotionSoundScreen(
 
     @Composable
     fun variationMenu(variations: Map<String, String>) {
+        val selectedVariationText = variations[viewModel.soundVariation] ?: "Bomb"
         Box(modifier = Modifier.padding(top = 100.dp)) {
             Button(onClick = { variationMenuExpanded = true }) {
-                Text(selectedVariation)
+                Text(selectedVariationText)
             }
             DropdownMenu(
                 expanded = variationMenuExpanded,
@@ -95,7 +95,6 @@ fun MotionSoundScreen(
                     DropdownMenuItem(
                         text = { Text(text) },
                         onClick = {
-                            selectedVariation = text
                             viewModel.soundVariation = id
                             variationMenuExpanded = false
                         }

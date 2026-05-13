@@ -1,6 +1,10 @@
 package com.example.motionsound.ui.viewmodel
 
 import android.app.Application
+import android.content.Context
+import android.hardware.camera2.CameraCharacteristics.FLASH_INFO_AVAILABLE
+import android.hardware.camera2.CameraManager
+import android.os.Bundle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +15,9 @@ import com.example.motionsound.sensor.MotionSensorManager
 class MotionSoundViewModel(application: Application) : AndroidViewModel(application) {
     private val soundPlayer = SoundPlayer(application)
     private val sensorManager = MotionSensorManager(application)
+    private val cameraManager =
+        application.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+    private var cameraIdWithFlash: String = "0"
 
     var movementDetected by mutableStateOf(false)
         private set
@@ -30,6 +37,16 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
         soundPlayer.loadSound("explosionfahh", "fahh.mp3")
         soundPlayer.loadSound("explosionpipe", "metalpipe.mp3")
         soundPlayer.loadSound("speed", "speed.wav")
+        soundPlayer.loadSound("gun", "gun.mp3")
+
+        val cameraList = cameraManager.cameraIdList
+        cameraList.forEach {
+            val characteristics = cameraManager.getCameraCharacteristics(it)
+            val doesCameraHaveFlash: Boolean? = characteristics.get(FLASH_INFO_AVAILABLE)
+            if (cameraIdWithFlash == "0" && doesCameraHaveFlash == true) {
+                cameraIdWithFlash = it
+            }
+        }
     }
 
     fun onPageChanged(page: Int) {
@@ -65,6 +82,13 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
             onMotionStop = {
                 finishMotion()
             },
+            onGunDetected = {
+                finishMotion()
+                movementDetected = true
+                toggleFlash(true)
+                soundPlayer.playSound("gun")
+                toggleFlash(false)
+            },
             getCurrentPage = { currentPage }
         )
     }
@@ -82,6 +106,10 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
     fun resetMovementDetection() {
         if (!isLooping)
             movementDetected = false
+    }
+
+    fun toggleFlash(state: Boolean = true) {
+        cameraManager.setTorchMode(cameraIdWithFlash, state)
     }
 
     override fun onCleared() {

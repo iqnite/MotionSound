@@ -18,6 +18,7 @@ class MotionSensorManager(context: Context) {
         onExplosionDetected: () -> Unit,
         onSpeedDetected: (Float) -> Unit,
         onMotionStop: () -> Unit,
+        onGunDetected: () -> Unit,
         getCurrentPage: () -> Int
     ) {
         listener = object : SensorEventListener {
@@ -33,6 +34,7 @@ class MotionSensorManager(context: Context) {
             private val MOVEMENT_THRESHOLD = 200f
             private val EXPLOSION_MOVE_SPEED_THRESHOLD = 800f
             private val STOP_SPEED_THRESHOLD = 60f
+            private val GUN_SHOT_THRESHOLD = 1000f
             private val EXPLOSION_MIN_THROW_DURATION = 200
 
             override fun onSensorChanged(event: SensorEvent) {
@@ -93,6 +95,10 @@ class MotionSensorManager(context: Context) {
                                     onMotionStop()
                                     isMoving = false
                                 }
+                            }
+                        } else if (currentPage == 4) {
+                            if (smoothedSpeed > GUN_SHOT_THRESHOLD) {
+                                onGunDetected()
                             }
                         }
 

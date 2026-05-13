@@ -57,7 +57,7 @@ fun MotionSoundScreen(
     modifier: Modifier = Modifier,
     viewModel: MotionSoundViewModel = viewModel()
 ) {
-    val pagerState = rememberPagerState(initialPage = 1, pageCount = { 4 })
+    val pagerState = rememberPagerState(initialPage = 1, pageCount = { 5 })
     var variationMenuExpanded by remember { mutableStateOf(false) }
     var selectedVariation by remember { mutableStateOf("Bomb") }
 
@@ -117,6 +117,7 @@ fun MotionSoundScreen(
                         1 -> "General movement"
                         2 -> "Throw"
                         3 -> "Speed"
+                        4 -> "Gun"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),

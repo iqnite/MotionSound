@@ -86,18 +86,6 @@ class MotionSensorManager(context: Context) {
                                 movementStartTime = currentTime
                             }
                         } else if (currentPage == 3) {
-                            if (smoothedSpeed > MOVEMENT_THRESHOLD) {
-                                isMoving = true
-                                onSpeedDetected(smoothedSpeed)
-                            } else if (isMoving && smoothedSpeed > STOP_SPEED_THRESHOLD) {
-                                onSpeedDetected(smoothedSpeed)
-                            } else if (smoothedSpeed < STOP_SPEED_THRESHOLD) {
-                                if (isMoving) {
-                                    onMotionStop()
-                                    isMoving = false
-                                }
-                            }
-                        } else if (currentPage == 4) {
                             if (smoothedSpeed > GUN_SHOT_THRESHOLD) {
                                 if (isMoving) {
                                     if (currentTime - movementStartTime > GUN_MULTISHOT_THRESHOLD) {
@@ -110,6 +98,18 @@ class MotionSensorManager(context: Context) {
                                 }
                             } else {
                                 isMoving = false
+                            }
+                        } else if (currentPage == 4) {
+                            if (smoothedSpeed > MOVEMENT_THRESHOLD) {
+                                isMoving = true
+                                onSpeedDetected(smoothedSpeed)
+                            } else if (isMoving && smoothedSpeed > STOP_SPEED_THRESHOLD) {
+                                onSpeedDetected(smoothedSpeed)
+                            } else if (smoothedSpeed < STOP_SPEED_THRESHOLD) {
+                                if (isMoving) {
+                                    onMotionStop()
+                                    isMoving = false
+                                }
                             }
                         }
 

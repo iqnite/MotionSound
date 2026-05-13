@@ -115,8 +115,8 @@ fun MotionSoundScreen(
                         0 -> "Silent"
                         1 -> "General movement"
                         2 -> "Throw"
-                        3 -> "Speed"
-                        4 -> "Gun"
+                        3 -> "Gun"
+                        4 -> "Speed"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),

@@ -35,6 +35,7 @@ class MotionSensorManager(context: Context) {
             private val EXPLOSION_MOVE_SPEED_THRESHOLD = 800f
             private val STOP_SPEED_THRESHOLD = 60f
             private val GUN_SHOT_THRESHOLD = 1000f
+            private val GUN_MULTISHOT_THRESHOLD = 1000f
             private val EXPLOSION_MIN_THROW_DURATION = 200
 
             override fun onSensorChanged(event: SensorEvent) {
@@ -98,7 +99,17 @@ class MotionSensorManager(context: Context) {
                             }
                         } else if (currentPage == 4) {
                             if (smoothedSpeed > GUN_SHOT_THRESHOLD) {
-                                onGunDetected()
+                                if (isMoving) {
+                                    if (currentTime - movementStartTime > GUN_MULTISHOT_THRESHOLD) {
+                                        onGunDetected()
+                                    }
+                                } else {
+                                    movementStartTime = currentTime
+                                    isMoving = true
+                                    onGunDetected()
+                                }
+                            } else {
+                                isMoving = false
                             }
                         }
 

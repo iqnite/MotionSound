@@ -30,13 +30,13 @@ class MotionSensorManager(context: Context) {
             private var movementStartTime: Long = 0
             private var lastPage = -1
             private var smoothedSpeed = 0f
-            private val SMOOTHING_FACTOR = 0.2f
+            private val SMOOTHING_FACTOR = 0.5f
             private val MOVEMENT_THRESHOLD = 200f
-            private val EXPLOSION_MOVE_SPEED_THRESHOLD = 800f
-            private val STOP_SPEED_THRESHOLD = 60f
+            private val EXPLOSION_MOVE_SPEED_THRESHOLD = 2000f
+            private val STOP_SPEED_THRESHOLD = 150f
             private val GUN_SHOT_THRESHOLD = 1000f
             private val GUN_MULTISHOT_THRESHOLD = 1000f
-            private val EXPLOSION_MIN_THROW_DURATION = 200
+            private val EXPLOSION_MIN_THROW_DURATION = 500
 
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
@@ -72,18 +72,14 @@ class MotionSensorManager(context: Context) {
                         if (currentPage == 1 && smoothedSpeed > MOVEMENT_THRESHOLD) {
                             onJumpDetected()
                         } else if (currentPage == 2) {
-                            if (isMoving) {
-                                if (smoothedSpeed < STOP_SPEED_THRESHOLD && currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
+                            if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                                isMoving = true
+                                movementStartTime = currentTime
+                            } else if (isMoving && smoothedSpeed < STOP_SPEED_THRESHOLD) {
+                                if (currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
                                     onExplosionDetected()
                                     isMoving = false
                                 }
-                                if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
-                                    isMoving = false
-                                    movementStartTime = currentTime
-                                }
-                            } else if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
-                                isMoving = true
-                                movementStartTime = currentTime
                             }
                         } else if (currentPage == 3) {
                             if (smoothedSpeed > GUN_SHOT_THRESHOLD) {

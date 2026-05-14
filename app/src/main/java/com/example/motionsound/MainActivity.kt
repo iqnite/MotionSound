@@ -189,11 +189,11 @@ fun MotionSoundScreen(
                 Text(
                     text = when (page) {
                         0 -> "Won't play any sound."
-                        1 -> "Move the phone around to play sound."
-                        2 -> "Quickly move the phone up and down to play sound."
-                        3 -> "Throw the phone to play sound."
-                        4 -> "Move the phone faster for higher pitch"
-                        else -> "Page $page"
+                        1 -> "Move the phone around to play sound!"
+                        2 -> "Quickly move the phone up and down to play sound and flash the torch!"
+                        3 -> "Throw the phone to play sound!"
+                        4 -> "Move the phone faster for higher pitch!"
+                        else -> "I forgot to add text to this page."
                     },
                     modifier = Modifier
                         .fillMaxWidth()

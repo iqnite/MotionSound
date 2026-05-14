@@ -9,16 +9,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -83,7 +95,7 @@ fun MotionSoundScreen(
     @Composable
     fun variationMenu(variations: Map<String, String>) {
         val selectedVariationText = variations[viewModel.soundVariation] ?: "Bomb"
-        Box(modifier = Modifier.padding(top = 100.dp)) {
+        Box(modifier = Modifier.padding(top = 20.dp)) {
             Button(onClick = { variationMenuExpanded = true }) {
                 Text(selectedVariationText)
             }
@@ -104,26 +116,103 @@ fun MotionSoundScreen(
         }
     }
 
+    @Composable
+    fun CautionBanner(message: String, modifier: Modifier = Modifier) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFF251E00))
+                .drawBehind {
+                    val strokeWidth = 4.dp.toPx()
+                    drawLine(
+                        color = Color(0xFFFFC107),
+                        start = Offset(strokeWidth / 2, 0f),
+                        end = Offset(strokeWidth / 2, size.height),
+                        strokeWidth = strokeWidth
+                    )
+                }
+                .padding(start = 16.dp, top = 12.dp, end = 12.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier
+                    .size(16.dp)
+                    .padding(top = 2.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = "CAUTION",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
+                )
+            }
+        }
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f)
         ) { page ->
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = when (page) {
                         0 -> "Silent"
-                        1 -> "General movement"
+                        1 -> "General"
                         2 -> "Gun"
                         3 -> "Throw"
                         4 -> "Speed"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.displayMedium
+                )
+                Text(
+                    text = when (page) {
+                        0 -> "Won't play any sound."
+                        1 -> "Move the phone around to play sound."
+                        2 -> "Quickly move the phone up and down to play sound."
+                        3 -> "Throw the phone to play sound."
+                        4 -> "Move the phone faster for higher pitch"
+                        else -> "Page $page"
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 if (page == 3) {
-                    variationMenu(mapOf(("" to "Bomb"), ("fahh" to "Fahh"), ("pipe" to "Pipe")))
+                    variationMenu(mapOf(("" to "Bomb"), ("pipe" to "Pipe"), ("fahh" to "Fahh")))
+                }
+                if (page == 2 || page == 3) {
+                    CautionBanner(
+                        message = when (page) {
+                            2 -> "Do not use in public."
+                            3 -> "I am not responsible for any damage that may occur to your phone"
+                            else -> ""
+                        },
+                        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                    )
                 }
             }
         }
@@ -152,7 +241,7 @@ fun MotionSoundScreen(
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = if (viewModel.movementDetected) "Moving!" else "Move the phone to play sound")
+            Text(text = if (viewModel.movementDetected) "Detected!" else "")
         }
     }
 }

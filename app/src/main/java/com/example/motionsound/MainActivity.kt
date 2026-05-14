@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -118,15 +117,16 @@ fun MotionSoundScreen(
 
     @Composable
     fun CautionBanner(message: String, modifier: Modifier = Modifier) {
+        val colorScheme = MaterialTheme.colorScheme
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFF251E00))
+                .background(colorScheme.secondaryContainer)
                 .drawBehind {
                     val strokeWidth = 4.dp.toPx()
                     drawLine(
-                        color = Color(0xFFFFC107),
+                        color = colorScheme.secondary,
                         start = Offset(strokeWidth / 2, 0f),
                         end = Offset(strokeWidth / 2, size.height),
                         strokeWidth = strokeWidth
@@ -138,7 +138,7 @@ fun MotionSoundScreen(
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = null,
-                tint = Color.White,
+                tint = colorScheme.onSecondaryContainer,
                 modifier = Modifier
                     .size(16.dp)
                     .padding(top = 2.dp)
@@ -149,14 +149,14 @@ fun MotionSoundScreen(
                     text = "CAUTION",
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colorScheme.onSecondaryContainer
                     )
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color.White.copy(alpha = 0.9f)
+                        color = colorScheme.onSecondaryContainer.copy(alpha = 0.9f)
                     )
                 )
             }
@@ -208,7 +208,7 @@ fun MotionSoundScreen(
                     CautionBanner(
                         message = when (page) {
                             2 -> "Do not use in public."
-                            3 -> "I am not responsible for any damage that may occur to your phone"
+                            3 -> "I am not responsible for any damage that may occur to your phone."
                             else -> ""
                         },
                         modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -223,9 +223,10 @@ fun MotionSoundScreen(
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
+            val colorScheme = MaterialTheme.colorScheme
             repeat(pagerState.pageCount) { iteration ->
                 val color =
-                    if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                    if (pagerState.currentPage == iteration) colorScheme.primary else colorScheme.secondaryContainer
                 Box(
                     modifier = Modifier
                         .padding(4.dp)

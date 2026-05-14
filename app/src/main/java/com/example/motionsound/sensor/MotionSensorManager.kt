@@ -72,16 +72,6 @@ class MotionSensorManager(context: Context) {
                         if (currentPage == 1 && smoothedSpeed > MOVEMENT_THRESHOLD) {
                             onJumpDetected()
                         } else if (currentPage == 2) {
-                            if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
-                                isMoving = true
-                                movementStartTime = currentTime
-                            } else if (isMoving && smoothedSpeed < STOP_SPEED_THRESHOLD) {
-                                if (currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
-                                    onExplosionDetected()
-                                    isMoving = false
-                                }
-                            }
-                        } else if (currentPage == 3) {
                             if (smoothedSpeed > GUN_SHOT_THRESHOLD) {
                                 if (isMoving) {
                                     if (currentTime - movementStartTime > GUN_MULTISHOT_THRESHOLD) {
@@ -94,6 +84,16 @@ class MotionSensorManager(context: Context) {
                                 }
                             } else {
                                 isMoving = false
+                            }
+                        } else if (currentPage == 3) {
+                            if (smoothedSpeed > EXPLOSION_MOVE_SPEED_THRESHOLD) {
+                                isMoving = true
+                                movementStartTime = currentTime
+                            } else if (isMoving && smoothedSpeed < STOP_SPEED_THRESHOLD) {
+                                if (currentTime - movementStartTime > EXPLOSION_MIN_THROW_DURATION) {
+                                    onExplosionDetected()
+                                    isMoving = false
+                                }
                             }
                         } else if (currentPage == 4) {
                             if (smoothedSpeed > MOVEMENT_THRESHOLD) {

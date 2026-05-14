@@ -114,15 +114,15 @@ fun MotionSoundScreen(
                     text = when (page) {
                         0 -> "Silent"
                         1 -> "General movement"
-                        2 -> "Throw"
-                        3 -> "Gun"
+                        2 -> "Gun"
+                        3 -> "Throw"
                         4 -> "Speed"
                         else -> "Page $page"
                     },
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-                if (page == 2) {
+                if (page == 3) {
                     variationMenu(mapOf(("" to "Bomb"), ("fahh" to "Fahh"), ("pipe" to "Pipe")))
                 }
             }

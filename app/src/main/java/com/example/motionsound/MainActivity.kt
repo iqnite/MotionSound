@@ -93,7 +93,7 @@ fun MotionSoundScreen(
     }
 
     @Composable
-    fun variationMenu(variations: Map<String, String>) {
+    fun VariationMenu(variations: Map<String, String>) {
         val selectedVariationText = variations[viewModel.soundVariation] ?: "Bomb"
         Box(modifier = Modifier.padding(top = 20.dp)) {
             Button(onClick = { variationMenuExpanded = true }) {
@@ -202,7 +202,7 @@ fun MotionSoundScreen(
                     style = MaterialTheme.typography.bodyLarge
                 )
                 if (page == 3) {
-                    variationMenu(mapOf(("" to "Bomb"), ("pipe" to "Pipe"), ("fahh" to "Fahh")))
+                    VariationMenu(mapOf(("" to "Bomb"), ("pipe" to "Pipe"), ("fahh" to "Fahh")))
                 }
                 if (page == 2 || page == 3) {
                     CautionBanner(

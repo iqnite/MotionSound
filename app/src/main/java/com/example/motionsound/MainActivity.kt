@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -173,6 +174,21 @@ fun MotionSoundScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Icon(
+                    painter = painterResource(
+                        id = when (page) {
+                            0 -> R.drawable.ic_mute
+                            1 -> R.drawable.ic_generalmotion
+                            2 -> R.drawable.ic_gunmotion
+                            3 -> R.drawable.ic_throwmotion
+                            4 -> R.drawable.ic_speedmotion
+                            else -> R.drawable.ic_launcher_foreground
+                        }
+                    ),
+                    contentDescription = "Page $page icon",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(16.dp)
+                )
                 Text(
                     text = when (page) {
                         0 -> "Silent"

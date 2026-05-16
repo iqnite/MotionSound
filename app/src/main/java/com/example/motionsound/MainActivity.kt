@@ -192,7 +192,7 @@ fun MotionSoundScreen(
                 Text(
                     text = when (page) {
                         0 -> "Silent"
-                        1 -> "General"
+                        1 -> "Welcome!"
                         2 -> "Gun"
                         3 -> "Throw"
                         4 -> "Speed"
@@ -204,8 +204,8 @@ fun MotionSoundScreen(
                 )
                 Text(
                     text = when (page) {
-                        0 -> "Won't play any sound."
-                        1 -> "Move the phone around to play sound. Swipe right to try the other modes, swipe left to mute!"
+                        0 -> "Won't play any sound.\nSwipe to the left to unmute."
+                        1 -> "Move the phone around to play sound.\nSwipe to the left to try the other modes, swipe to the right to mute!"
                         2 -> "Quickly move the phone up and down to play sound and flash the torch!"
                         3 -> "Throw the phone to play sound!"
                         4 -> "Move the phone faster for higher pitch!"

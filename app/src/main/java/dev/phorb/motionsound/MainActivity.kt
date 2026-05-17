@@ -78,7 +78,7 @@ fun MotionSoundScreen(
     modifier: Modifier = Modifier,
     viewModel: dev.phorb.motionsound.ui.viewmodel.MotionSoundViewModel = viewModel()
 ) {
-    val pagerState = rememberPagerState(initialPage = 1, pageCount = { 5 })
+    val pagerState = rememberPagerState(initialPage = 1, pageCount = { 6 })
     var variationMenuExpanded by remember { mutableStateOf(false) }
 
     // Sync pager state with ViewModel
@@ -228,6 +228,7 @@ fun MotionSoundScreen(
                         2 -> stringResource(R.string.gun_title)
                         3 -> stringResource(R.string.throw_title)
                         4 -> stringResource(R.string.speed_title)
+                        5 -> stringResource(R.string.coming_soon)
                         else -> stringResource(R.string.page_i, page)
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -241,6 +242,7 @@ fun MotionSoundScreen(
                         2 -> stringResource(R.string.gun_description)
                         3 -> stringResource(R.string.throw_description)
                         4 -> stringResource(R.string.speed_description)
+                        5 -> stringResource(R.string.coming_soon_description)
                         else -> stringResource(R.string.other_page_description)
                     },
                     modifier = Modifier
@@ -266,6 +268,12 @@ fun MotionSoundScreen(
                             else -> ""
                         },
                         modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                    )
+                }
+                if (page == 5) {
+                    Hyperlink(
+                        text = stringResource(R.string.more_projects),
+                        url = stringResource(R.string.homepage_url)
                     )
                 }
             }
@@ -296,13 +304,7 @@ fun MotionSoundScreen(
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column {
-                Text(text = if (viewModel.movementDetected) stringResource(R.string.detected) else "")
-                Hyperlink(
-                    text = stringResource(R.string.more_projects),
-                    url = stringResource(R.string.homepage_url)
-                )
-            }
+            Text(text = if (viewModel.movementDetected) stringResource(R.string.detected) else "")
         }
     }
 }

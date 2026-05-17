@@ -22,5 +22,5 @@
     <string name="more_projects">See more projects</string>
     <string name="homepage_url" translatable="false">https://iqnite.github.io</string>
     <string name="coming_soon">Coming soon™</string>
-    <string name="coming_soon_description">I\'m working on adding new bugs... erm, FEATURES to the app. Stay tuned!</string>
+    <string name="coming_soon_description">I\'m working on adding new bugs&#8230; erm, FEATURES to the app. Stay tuned!</string>
 </resources>

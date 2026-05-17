@@ -41,13 +41,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.phorb.motionsound.ui.theme.MotionSoundTheme
 import kotlinx.coroutines.delay
-import kotlin.collections.iterator
 
 class MainActivity : androidx.activity.ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,8 +102,31 @@ fun MotionSoundScreen(
     }
 
     @Composable
+    fun StyledLinkAnnotation(url: String): LinkAnnotation.Url = LinkAnnotation.Url(
+        url,
+        TextLinkStyles(
+            style = SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        ),
+    )
+
+    @Composable
+    fun Hyperlink(text: String, url: String) {
+        Text(
+            buildAnnotatedString {
+                withLink(StyledLinkAnnotation(url)) {
+                    append(text)
+                }
+            }
+        )
+    }
+
+    @Composable
     fun VariationMenu(variations: Map<String, String>) {
-        val selectedVariationText = variations[viewModel.soundVariation] ?: "Bomb"
+        val selectedVariationText =
+            variations[viewModel.soundVariation] ?: variations.values.firstOrNull() ?: ""
         Box(modifier = Modifier.padding(top = 20.dp)) {
             Button(onClick = { variationMenuExpanded = true }) {
                 Text(selectedVariationText)
@@ -150,7 +179,7 @@ fun MotionSoundScreen(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "CAUTION",
+                    text = stringResource(R.string.caution).uppercase(),
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.onSecondaryContainer
@@ -188,18 +217,18 @@ fun MotionSoundScreen(
                             else -> R.drawable.ic_launcher_foreground
                         }
                     ),
-                    contentDescription = "Page $page icon",
+                    contentDescription = stringResource(R.string.page_i, page),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(16.dp)
                 )
                 Text(
                     text = when (page) {
-                        0 -> "Silent"
-                        1 -> "Welcome!"
-                        2 -> "Gun"
-                        3 -> "Throw"
-                        4 -> "Speed"
-                        else -> "Page $page"
+                        0 -> stringResource(R.string.silent_title)
+                        1 -> stringResource(R.string.general_title)
+                        2 -> stringResource(R.string.gun_title)
+                        3 -> stringResource(R.string.throw_title)
+                        4 -> stringResource(R.string.speed_title)
+                        else -> stringResource(R.string.page_i, page)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
@@ -207,12 +236,12 @@ fun MotionSoundScreen(
                 )
                 Text(
                     text = when (page) {
-                        0 -> "Won't play any sound.\nSwipe to the left to unmute."
-                        1 -> "Move the phone around to play sound.\nSwipe to the left to try the other modes, swipe to the right to mute!"
-                        2 -> "Quickly move the phone up and down to play sound and flash the torch!"
-                        3 -> "Throw the phone to play sound!"
-                        4 -> "Move the phone faster for higher pitch!"
-                        else -> "I forgot to add text to this page."
+                        0 -> stringResource(R.string.silent_description)
+                        1 -> stringResource(R.string.general_description)
+                        2 -> stringResource(R.string.gun_description)
+                        3 -> stringResource(R.string.throw_description)
+                        4 -> stringResource(R.string.speed_description)
+                        else -> stringResource(R.string.other_page_description)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -221,13 +250,19 @@ fun MotionSoundScreen(
                     style = MaterialTheme.typography.bodyLarge
                 )
                 if (page == 3) {
-                    VariationMenu(mapOf(("" to "Bomb"), ("pipe" to "Pipe"), ("fahh" to "Fahh")))
+                    VariationMenu(
+                        mapOf(
+                            ("" to stringResource(R.string.bomb)),
+                            ("pipe" to stringResource(R.string.pipe)),
+                            ("fahh" to stringResource(R.string.fahh))
+                        )
+                    )
                 }
                 if (page == 2 || page == 3) {
                     CautionBanner(
                         message = when (page) {
-                            2 -> "Do not use in public."
-                            3 -> "I am not responsible for any damage that may occur to your phone."
+                            2 -> stringResource(R.string.gun_warning)
+                            3 -> stringResource(R.string.throw_warning)
                             else -> ""
                         },
                         modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -261,7 +296,13 @@ fun MotionSoundScreen(
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = if (viewModel.movementDetected) "Detected!" else "")
+            Column {
+                Text(text = if (viewModel.movementDetected) stringResource(R.string.detected) else "")
+                Hyperlink(
+                    text = stringResource(R.string.more_projects),
+                    url = stringResource(R.string.homepage_url)
+                )
+            }
         }
     }
 }

@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name" translatable="false">Yeetme!</string>
+    <string name="bomb">Bomb</string>
+    <string name="caution">Caution</string>
+    <string name="page_i">Page %1$d</string>
+    <string name="silent_title">Silent</string>
+    <string name="general_title">Welcome!</string>
+    <string name="gun_title">Gun</string>
+    <string name="throw_title">Throw</string>
+    <string name="speed_title">Speed</string>
+    <string name="silent_description">Won\'t play any sound.\nSwipe to the left to unmute.</string>
+    <string name="general_description">Move the phone around to play sound.\nSwipe to the left to try the other modes, swipe to the right to mute!</string>
+    <string name="gun_description">Quickly move the phone up and down to play sound and flash the torch!</string>
+    <string name="throw_description">Throw the phone to play sound!</string>
+    <string name="speed_description">Move the phone faster for higher pitch!</string>
+    <string name="other_page_description">I forgot to add text to this page.</string>
+    <string name="pipe">Pipe</string>
+    <string name="fahh">Fahh</string>
+    <string name="gun_warning">Do not use in public.</string>
+    <string name="throw_warning">I am not responsible for any damage that may occur to your phone.</string>
+    <string name="detected">Detected!</string>
+    <string name="more_projects">See more projects</string>
+    <string name="homepage_url" translatable="false">https://iqnite.github.io</string>
 </resources>

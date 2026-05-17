@@ -1,4 +1,4 @@
-package com.example.motionsound.audio
+package dev.phorb.motionsound.audio
 
 import android.content.Context
 import android.media.AudioAttributes

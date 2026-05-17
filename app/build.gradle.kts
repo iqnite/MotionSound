@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.motionsound"
+    namespace = "dev.phorb.motionsound"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.motionsound"
+        applicationId = "dev.phorb.motionsound"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

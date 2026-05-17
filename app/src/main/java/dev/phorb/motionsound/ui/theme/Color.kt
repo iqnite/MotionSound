@@ -1,4 +1,4 @@
-package com.example.motionsound.ui.theme
+package dev.phorb.motionsound.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

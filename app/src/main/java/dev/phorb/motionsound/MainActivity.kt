@@ -1,7 +1,6 @@
-package com.example.motionsound
+package dev.phorb.motionsound
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -46,18 +45,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.motionsound.ui.theme.MotionSoundTheme
-import com.example.motionsound.ui.viewmodel.MotionSoundViewModel
+import dev.phorb.motionsound.ui.theme.MotionSoundTheme
 import kotlinx.coroutines.delay
+import kotlin.collections.iterator
 
-class MainActivity : ComponentActivity() {
+class MainActivity : androidx.activity.ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MotionSoundTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MotionSoundScreen(modifier = Modifier.padding(innerPadding))
+                    MotionSoundScreen(
+                        modifier = Modifier.padding(
+                            innerPadding
+                        )
+                    )
                 }
             }
         }
@@ -67,7 +70,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MotionSoundScreen(
     modifier: Modifier = Modifier,
-    viewModel: MotionSoundViewModel = viewModel()
+    viewModel: dev.phorb.motionsound.ui.viewmodel.MotionSoundViewModel = viewModel()
 ) {
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 5 })
     var variationMenuExpanded by remember { mutableStateOf(false) }
@@ -177,12 +180,12 @@ fun MotionSoundScreen(
                 Icon(
                     painter = painterResource(
                         id = when (page) {
-                            0 -> R.drawable.ic_mute
-                            1 -> R.drawable.ic_generalmotion
-                            2 -> R.drawable.ic_gunmotion
-                            3 -> R.drawable.ic_throwmotion
-                            4 -> R.drawable.ic_speedmotion
-                            else -> R.drawable.ic_launcher_foreground
+                            0 -> dev.phorb.motionsound.R.drawable.ic_mute
+                            1 -> dev.phorb.motionsound.R.drawable.ic_generalmotion
+                            2 -> dev.phorb.motionsound.R.drawable.ic_gunmotion
+                            3 -> dev.phorb.motionsound.R.drawable.ic_throwmotion
+                            4 -> dev.phorb.motionsound.R.drawable.ic_speedmotion
+                            else -> dev.phorb.motionsound.R.drawable.ic_launcher_foreground
                         }
                     ),
                     contentDescription = "Page $page icon",

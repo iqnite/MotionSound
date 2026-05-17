@@ -1,4 +1,4 @@
-package com.example.motionsound
+package dev.phorb.motionsound
 
 import org.junit.Test
 

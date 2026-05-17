@@ -1,4 +1,4 @@
-package com.example.motionsound.sensor
+package dev.phorb.motionsound.sensor
 
 import android.content.Context
 import android.hardware.Sensor

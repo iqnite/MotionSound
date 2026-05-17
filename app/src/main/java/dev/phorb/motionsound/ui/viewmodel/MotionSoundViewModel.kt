@@ -17,7 +17,7 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
     private val sensorManager = MotionSensorManager(application)
     private val cameraManager =
         application.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-    private var cameraIdWithFlash: String = "0"
+    private var cameraIdWithFlash: String? = null
 
     var movementDetected by mutableStateOf(false)
         private set
@@ -29,7 +29,6 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
         private set
 
     var soundVariation by mutableStateOf("")
-        set
 
     init {
         soundPlayer.loadSound("jump", "jump.wav")
@@ -40,11 +39,11 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
         soundPlayer.loadSound("gun", "gun.mp3")
 
         val cameraList = cameraManager.cameraIdList
-        cameraList.forEach {
-            val characteristics = cameraManager.getCameraCharacteristics(it)
-            val doesCameraHaveFlash: Boolean? = characteristics.get(FLASH_INFO_AVAILABLE)
-            if (cameraIdWithFlash == "0" && doesCameraHaveFlash == true) {
-                cameraIdWithFlash = it
+        cameraList.forEach { id ->
+            val characteristics = cameraManager.getCameraCharacteristics(id)
+            if (characteristics.get(FLASH_INFO_AVAILABLE) == true) {
+                cameraIdWithFlash = id
+                return@forEach
             }
         }
     }
@@ -65,7 +64,7 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
             onExplosionDetected = {
                 finishMotion()
                 movementDetected = true
-                soundPlayer.playSound("explosion" + soundVariation)
+                soundPlayer.playSound("explosion$soundVariation")
             },
             onSpeedDetected = { speed ->
                 if (isLooping) {
@@ -109,7 +108,12 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun toggleFlash(state: Boolean = true) {
-        cameraManager.setTorchMode(cameraIdWithFlash, state)
+        cameraIdWithFlash?.let {
+            try {
+                cameraManager.setTorchMode(it, state)
+            } catch (_: Exception) {
+            }
+        }
     }
 
     override fun onCleared() {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.hardware.camera2.CameraCharacteristics.FLASH_INFO_AVAILABLE
 import android.hardware.camera2.CameraManager
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -24,7 +25,7 @@ class MotionSoundViewModel(application: Application) : AndroidViewModel(applicat
     var isLooping by mutableStateOf(false)
         private set
 
-    var currentPage by mutableStateOf(0)
+    var currentPage by mutableIntStateOf(0)
         private set
 
     var soundVariation by mutableStateOf("")

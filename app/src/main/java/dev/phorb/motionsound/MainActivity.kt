@@ -180,12 +180,12 @@ fun MotionSoundScreen(
                 Icon(
                     painter = painterResource(
                         id = when (page) {
-                            0 -> dev.phorb.motionsound.R.drawable.ic_mute
-                            1 -> dev.phorb.motionsound.R.drawable.ic_generalmotion
-                            2 -> dev.phorb.motionsound.R.drawable.ic_gunmotion
-                            3 -> dev.phorb.motionsound.R.drawable.ic_throwmotion
-                            4 -> dev.phorb.motionsound.R.drawable.ic_speedmotion
-                            else -> dev.phorb.motionsound.R.drawable.ic_launcher_foreground
+                            0 -> R.drawable.ic_mute
+                            1 -> R.drawable.ic_generalmotion
+                            2 -> R.drawable.ic_gunmotion
+                            3 -> R.drawable.ic_throwmotion
+                            4 -> R.drawable.ic_speedmotion
+                            else -> R.drawable.ic_launcher_foreground
                         }
                     ),
                     contentDescription = "Page $page icon",

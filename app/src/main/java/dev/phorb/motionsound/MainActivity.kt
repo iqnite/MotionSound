@@ -214,6 +214,7 @@ fun MotionSoundScreen(
                             2 -> R.drawable.ic_gunmotion
                             3 -> R.drawable.ic_throwmotion
                             4 -> R.drawable.ic_speedmotion
+                            5 -> R.drawable.ic_comingsoon
                             else -> R.drawable.ic_launcher_foreground
                         }
                     ),

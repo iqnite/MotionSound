@@ -2,7 +2,7 @@
 
 The only app you will ever need on your phone.
 
-[**Install**](https://github.com/iqnite/MotionSound/releases) | [**Learn more**](#description)
+[**Install**](https://github.com/iqnite/MotionSound/releases/latest) | [**Learn more**](#description)
 
 ![App icon](.github/readme_images/icon_round.webp)
 
